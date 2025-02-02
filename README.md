@@ -4,28 +4,6 @@ A Node.js application that transcribes audio recordings into text and automatica
 
 ![img_1.png](img_1.png)
 
-## Features
-
-- Audio file transcription using OpenAI's Whisper model
-- Automatic saving of transcriptions to Google Docs
-- Timestamp recording for each transcription
-- Support for M4A audio format
-- RESTful API interface
-
-## Technical Stack
-
-- Node.js with Express.js
-- OpenAI API (Whisper model for transcription)
-- Google Docs API
-- Multer for file upload handling
-
-## Prerequisites
-
-- Node.js installed
-- OpenAI API key
-- Google Cloud project with enabled Google Docs API
-- Google Service Account credentials
-
 ## Environment Variables
 
 Create a `.env` file with the following variables:
@@ -48,3 +26,25 @@ TOKEN_URI=https://oauth2.googleapis.com/token
 AUTH_PROVIDER_X509_CERT_URL=https://www.googleapis.com/oauth2/v1/certs
 CLIENT_X509_CERT_URL=your_cert_url
 ```
+
+## Features
+
+- Audio file transcription using OpenAI's Whisper model
+- Automatic saving of transcriptions to Google Docs
+- Timestamp recording for each transcription
+- Support for M4A audio format
+- RESTful API interface
+
+## Technical Stack
+
+- Node.js with Express.js
+- OpenAI API (Whisper model for transcription)
+- Google Docs API
+- Multer for file upload handling
+
+## Prerequisites
+
+- Node.js installed
+- OpenAI API key
+- Google Cloud project with enabled Google Docs API
+- Google Service Account credentials
