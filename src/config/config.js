@@ -7,6 +7,7 @@ export const config = {
   openai: {
     apiKey: process.env.OPENAI_SPEECH_API_KEY,
   },
+  personalAuthToken: process.env.PERSONAL_AUTH_TOKEN,
   google: {
     credentials: {
       type: process.env.TYPE,

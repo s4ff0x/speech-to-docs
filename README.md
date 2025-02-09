@@ -12,6 +12,7 @@ Create a `.env` file with the following variables:
 OPENAI_SPEECH_API_KEY=
 DOC_ID=
 TIMEZONE=Asia/Jerusalem
+PERSONAL_AUTH_TOKEN=
 
 # Google Service Account Credentials
 TYPE=
