@@ -1,7 +1,7 @@
 import { File } from "fetch-blob/file.js";
 import { openAIService } from "../services/openai.service.js";
 import { googleDocsService } from "../services/google-docs.service.js";
-import { config } from "src/config/config.js";
+import { config } from "../config/config.js";
 
 export class TranscriptionController {
   async transcribe(req, res) {
