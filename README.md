@@ -2,7 +2,10 @@
 
 A Node.js application that transcribes audio recordings into text and automatically saves them to Google Docs. Perfect for maintaining voice notes, meeting minutes, or any spoken content in a written format.
 
+[Setup Example (Article)](https://dev.to/anton_mendelson/voice-journal-with-a-single-tap-on-iphone-gpt-api-and-google-docs-137b)
+
 ![img_1.png](img_1.png)
+
 
 ## Environment Variables
 
