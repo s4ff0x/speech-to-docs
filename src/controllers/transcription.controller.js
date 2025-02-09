@@ -6,7 +6,10 @@ import { config } from "src/config/config.js";
 export class TranscriptionController {
   async transcribe(req, res) {
     try {
-      if (req.headers.authorization !== config.personalAuthToken) {
+      if (
+        !req.headers.authorization ||
+        req.headers.authorization !== config.personalAuthToken
+      ) {
         return res
           .status(401)
           .json({ error: "Authorization header is missing." });
