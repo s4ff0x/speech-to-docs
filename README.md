@@ -10,9 +10,9 @@ Create a `.env` file with the following variables:
 
 ```plaintext
 OPENAI_SPEECH_API_KEY=
-DOC_ID=
-TIMEZONE=Asia/Jerusalem
-PERSONAL_AUTH_TOKEN=
+DOC_ID=The ID of the Google document where the text will be saved
+TIMEZONE=your_timezone (example: Asia/Jerusalem)
+PERSONAL_AUTH_TOKEN=Create your personal key to use when calling the API 
 
 # Google Service Account Credentials
 TYPE=
@@ -48,3 +48,11 @@ CLIENT_X509_CERT_URL=
 - OpenAI API key
 - Google Cloud project with enabled Google Docs API
 - Google Service Account credentials
+
+## How to test api with curl
+
+```bash
+curl -F "audio=@[path to file].m4a;type=audio/m4a" \
+-H "Authorization:[your personal auth token]" \
+-X POST https://[your api url]/transcribe
+```
