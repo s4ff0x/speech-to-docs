@@ -9,22 +9,21 @@ A Node.js application that transcribes audio recordings into text and automatica
 Create a `.env` file with the following variables:
 
 ```plaintext
-PORT=3000
-OPENAI_SPEECH_API_KEY=your_openai_api_key
-DOC_ID=your_google_doc_id
-TIMEZONE=your_timezone (example: Asia/Jerusalem)
+OPENAI_SPEECH_API_KEY=
+DOC_ID=
+TIMEZONE=
 
 # Google Service Account Credentials
-TYPE=service_account
-PROJECT_ID=your_project_id
-PRIVATE_KEY_ID=your_private_key_id
-PRIVATE_KEY=your_private_key
-CLIENT_EMAIL=your_client_email
-CLIENT_ID=your_client_id
-AUTH_URI=https://accounts.google.com/o/oauth2/auth
-TOKEN_URI=https://oauth2.googleapis.com/token
-AUTH_PROVIDER_X509_CERT_URL=https://www.googleapis.com/oauth2/v1/certs
-CLIENT_X509_CERT_URL=your_cert_url
+TYPE=
+PROJECT_ID=
+PRIVATE_KEY_ID=
+PRIVATE_KEY=
+CLIENT_EMAIL=
+CLIENT_ID=
+AUTH_URI=
+TOKEN_URI=
+AUTH_PROVIDER_X509_CERT_URL=
+CLIENT_X509_CERT_URL=
 ```
 
 ## Features
