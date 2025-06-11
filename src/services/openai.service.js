@@ -42,6 +42,9 @@ class OpenAIService {
 
     const response = await this.client.chat.completions.create({
       model: "gpt-4o",
+      response_format: {
+        type: "json_object",
+      },
       messages: [
         {
           role: "system",
