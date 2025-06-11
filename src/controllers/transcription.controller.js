@@ -21,18 +21,37 @@ export class TranscriptionController {
 
       const fileBlob = this.createFileBlob(req.file);
 
-      const rawTranscriptionText =
-        await openAIService.transcribeAudio(fileBlob);
-      console.log("Original Transcription:", rawTranscriptionText);
+      let rawTranscriptionText;
+      try {
+        rawTranscriptionText = await openAIService.transcribeAudio(fileBlob);
+        console.log("Original Transcription:", rawTranscriptionText);
+      } catch (error) {
+        console.error("Error during OpenAI transcription:", error.message);
+        return res.status(500).json({ 
+          error: "Failed to transcribe audio using OpenAI service",
+          details: error.message 
+        });
+      }
 
-      await googleDocsService.appendText(rawTranscriptionText);
+      try {
+        await googleDocsService.appendText(rawTranscriptionText);
+      } catch (error) {
+        console.error("Error during Google Docs update:", error.message);
+        return res.status(500).json({ 
+          error: "Failed to append text to Google Docs",
+          details: error.message 
+        });
+      }
 
       return res.json({
         message: "Transcription completed successfully!",
       });
     } catch (error) {
-      console.error("Error during transcription or doc update:", error.message);
-      return res.status(500).json({ error: error.message });
+      console.error("Unexpected error during transcription process:", error.message);
+      return res.status(500).json({ 
+        error: "Unexpected error occurred during transcription process",
+        details: error.message 
+      });
     }
   }
 

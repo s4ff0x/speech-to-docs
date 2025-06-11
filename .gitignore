@@ -131,3 +131,5 @@ dist
 .pnp.*
 
 google-service-account.json
+
+.DS_Store
