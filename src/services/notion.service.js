@@ -71,6 +71,9 @@ class NotionService {
       // Find a multiselect property for tags (look for 'tags', 'tag', 'categories', etc.)
       const tagsPropertyName = this.findTagsProperty(dbProperties);
 
+      // Find a suitable content property for the transcribed text
+      const contentPropertyName = this.findContentProperty(dbProperties);
+
       console.log("📄 Creating new page in Notion database...");
 
       // Create the page properties dynamically based on available properties
@@ -98,28 +101,32 @@ class NotionService {
         console.log(`✅ Using tags property: "${tagsPropertyName}"`);
       }
 
-      // Create the page with content
+      if (contentPropertyName) {
+        properties[contentPropertyName] = {
+          rich_text: [
+            {
+              type: "text",
+              text: {
+                content: transcribedText,
+              },
+            },
+          ],
+        };
+        console.log(
+          `✅ Using content property: "${contentPropertyName}" for transcribed text`
+        );
+      } else {
+        console.log(
+          "⚠️ No content property found in database. Transcribed text will not be stored."
+        );
+      }
+
+      // Create the page (content now goes to Content property instead of page body)
       const response = await this.client.pages.create({
         parent: {
           database_id: this.extractDatabaseId(config.notion.databaseId),
         },
         properties: properties,
-        children: [
-          {
-            object: "block",
-            type: "paragraph",
-            paragraph: {
-              rich_text: [
-                {
-                  type: "text",
-                  text: {
-                    content: transcribedText,
-                  },
-                },
-              ],
-            },
-          },
-        ],
       });
 
       console.log("✅ Notion page created successfully");
@@ -161,6 +168,34 @@ class NotionService {
     // If no tag-like property found, return the first multiselect property
     for (const [name, config] of Object.entries(properties)) {
       if (config.type === "multi_select") {
+        return name;
+      }
+    }
+
+    return null;
+  }
+
+  // Helper method to find a suitable content property
+  findContentProperty(properties) {
+    // Look for rich_text properties with content-like names
+    const contentNames = ["content", "text", "body", "description", "notes"];
+
+    for (const [name, config] of Object.entries(properties)) {
+      if (config.type === "rich_text") {
+        // Check if the property name contains any content-like words
+        if (
+          contentNames.some((contentName) =>
+            name.toLowerCase().includes(contentName)
+          )
+        ) {
+          return name;
+        }
+      }
+    }
+
+    // If no content-like property found, return the first rich_text property
+    for (const [name, config] of Object.entries(properties)) {
+      if (config.type === "rich_text") {
         return name;
       }
     }
