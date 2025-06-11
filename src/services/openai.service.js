@@ -22,7 +22,8 @@ class OpenAIService {
       messages: [
         {
           role: "system",
-          content: "You are a helpful grammar correction assistant. Fix the grammar only if there are hard errors like hard repetition or absence of meaning, but in all usual cases just keep style of the user's text.",
+          content:
+            "You are a helpful grammar correction assistant. Fix the grammar only if there are hard errors like hard repetition or absence of meaning, but in all usual cases just keep style of the user's text.",
         },
         {
           role: "user",
@@ -39,7 +40,8 @@ class OpenAIService {
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant that analyzes text and generates relevant tags for categorization. Generate 3-7 relevant tags based on the content, topics, and themes mentioned in the text. Return only the tags as a JSON array of strings, with each tag being 1-3 words max. Focus on topics, categories, actions, and key concepts.",
+          content:
+            "You are a helpful assistant that analyzes text and generates relevant tags for categorization. Generate 3-7 relevant tags based on the content, topics, and themes mentioned in the text. Return only the tags as a JSON array of strings, with each tag being 1-3 words max. Focus on topics, categories, actions, and key concepts.",
         },
         {
           role: "user",
@@ -47,7 +49,7 @@ class OpenAIService {
         },
       ],
     });
-    
+
     try {
       const tags = JSON.parse(response.choices[0].message.content.trim());
       return Array.isArray(tags) ? tags : [];
@@ -58,4 +60,4 @@ class OpenAIService {
   }
 }
 
-export const openAIService = new OpenAIService(); 
+export const openAIService = new OpenAIService();
