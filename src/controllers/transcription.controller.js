@@ -42,43 +42,71 @@ export class TranscriptionController {
       const fileBlob = this.createFileBlob(req.file);
       console.log(`✅ File blob created successfully`);
 
-      // OpenAI transcription
+      // OpenAI transcription with retry logic
       let rawTranscriptionText;
-      try {
-        console.log("🎙️ Starting OpenAI transcription...");
-        const transcriptionStartTime = Date.now();
-        rawTranscriptionText = await openAIService.transcribeAudio(fileBlob);
-        const transcriptionDuration = Date.now() - transcriptionStartTime;
-        
-        console.log("✅ OpenAI transcription completed successfully");
-        console.log(`⏱️ Transcription took: ${transcriptionDuration}ms`);
-        console.log(`📝 Transcription length: ${rawTranscriptionText.length} characters`);
-        console.log("📄 Original Transcription:", rawTranscriptionText);
-      } catch (error) {
-        console.error("❌ Error during OpenAI transcription:", error.message);
-        console.error("Stack trace:", error.stack);
-        return res.status(500).json({ 
-          error: "Failed to transcribe audio using OpenAI service",
-          details: error.message 
-        });
+      const maxRetries = 5;
+      const retryDelay = 3000; // 1 second delay between retries
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(`🎙️ Starting OpenAI transcription (attempt ${attempt}/${maxRetries})...`);
+          const transcriptionStartTime = Date.now();
+          rawTranscriptionText = await openAIService.transcribeAudio(fileBlob);
+          const transcriptionDuration = Date.now() - transcriptionStartTime;
+          
+          console.log("✅ OpenAI transcription completed successfully");
+          console.log(`⏱️ Transcription took: ${transcriptionDuration}ms`);
+          console.log(`📝 Transcription length: ${rawTranscriptionText.length} characters`);
+          console.log("📄 Original Transcription:", rawTranscriptionText);
+          break; // Success, exit retry loop
+        } catch (error) {
+          console.error(`❌ Error during OpenAI transcription (attempt ${attempt}/${maxRetries}):`, error.message);
+          
+          if (attempt === maxRetries) {
+            console.error("💥 All transcription attempts failed");
+            console.error("Stack trace:", error.stack);
+            return res.status(500).json({ 
+              error: "Failed to transcribe audio using OpenAI service after multiple attempts",
+              details: error.message,
+              attempts: maxRetries
+            });
+          }
+          
+          console.log(`⏳ Waiting ${retryDelay}ms before retry attempt ${attempt + 1}...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
       }
 
-      // Google Docs append
-      try {
-        console.log("📝 Appending text to Google Docs...");
-        const docsStartTime = Date.now();
-        await googleDocsService.appendText(rawTranscriptionText);
-        const docsDuration = Date.now() - docsStartTime;
-        
-        console.log("✅ Google Docs update completed successfully");
-        console.log(`⏱️ Docs update took: ${docsDuration}ms`);
-      } catch (error) {
-        console.error("❌ Error during Google Docs update:", error.message);
-        console.error("Stack trace:", error.stack);
-        return res.status(500).json({ 
-          error: "Failed to append text to Google Docs",
-          details: error.message 
-        });
+      // Google Docs append with retry logic
+      const docsMaxRetries = 5;
+      const docsRetryDelay = 3000; // 3 second delay between retries
+      
+      for (let attempt = 1; attempt <= docsMaxRetries; attempt++) {
+        try {
+          console.log(`📝 Appending text to Google Docs (attempt ${attempt}/${docsMaxRetries})...`);
+          const docsStartTime = Date.now();
+          await googleDocsService.appendText(rawTranscriptionText);
+          const docsDuration = Date.now() - docsStartTime;
+          
+          console.log("✅ Google Docs update completed successfully");
+          console.log(`⏱️ Docs update took: ${docsDuration}ms`);
+          break; // Success, exit retry loop
+        } catch (error) {
+          console.error(`❌ Error during Google Docs update (attempt ${attempt}/${docsMaxRetries}):`, error.message);
+          
+          if (attempt === docsMaxRetries) {
+            console.error("💥 All Google Docs update attempts failed");
+            console.error("Stack trace:", error.stack);
+            return res.status(500).json({ 
+              error: "Failed to append text to Google Docs after multiple attempts",
+              details: error.message,
+              attempts: docsMaxRetries
+            });
+          }
+          
+          console.log(`⏳ Waiting ${docsRetryDelay}ms before retry attempt ${attempt + 1}...`);
+          await new Promise(resolve => setTimeout(resolve, docsRetryDelay));
+        }
       }
 
       const totalDuration = Date.now() - startTime;
