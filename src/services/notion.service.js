@@ -15,19 +15,21 @@ class NotionService {
     if (/^[0-9a-f]{32}$/i.test(databaseIdOrUrl)) {
       return databaseIdOrUrl;
     }
-    
+
     // Extract from URL format: remove query parameters and hyphens
     const cleanId = databaseIdOrUrl
-      .split('?')[0] // Remove query parameters
-      .replace(/-/g, ''); // Remove hyphens
-    
+      .split("?")[0] // Remove query parameters
+      .replace(/-/g, ""); // Remove hyphens
+
     return cleanId;
   }
 
   async createPageWithTranscription(transcribedText) {
     try {
-      console.log("🏷️ Generating tags for transcribed text...");
-      const tags = await openAIService.generateTags(transcribedText);
+      console.log("🏷️ Generating title and tags for transcribed text...");
+      const { title, tags } =
+        await openAIService.generateTitleAndTags(transcribedText);
+      console.log(`✅ Generated title: "${title}"`);
       console.log(`✅ Generated ${tags.length} tags:`, tags);
 
       console.log("📋 Fetching database properties...");
@@ -36,35 +38,33 @@ class NotionService {
 
       // Find the title property (it's usually the first property or has type 'title')
       const titlePropertyName = this.findTitleProperty(dbProperties);
-      
+
       // Find a multiselect property for tags (look for 'tags', 'tag', 'categories', etc.)
       const tagsPropertyName = this.findTagsProperty(dbProperties);
 
       console.log("📄 Creating new page in Notion database...");
-      
-      const currentDate = new Date();
-      const formattedDate = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD format
-      const pageTitle = `Transcription - ${formattedDate} ${currentDate.toLocaleTimeString()}`;
 
       // Create the page properties dynamically based on available properties
       const properties = {};
-      
+
       if (titlePropertyName) {
         properties[titlePropertyName] = {
           title: [
             {
               text: {
-                content: pageTitle
-              }
-            }
-          ]
+                content: title,
+              },
+            },
+          ],
         };
-        console.log(`✅ Using title property: "${titlePropertyName}"`);
+        console.log(
+          `✅ Using title property: "${titlePropertyName}" with title: "${title}"`
+        );
       }
 
       if (tagsPropertyName) {
         properties[tagsPropertyName] = {
-          multi_select: tags.map(tag => ({ name: tag }))
+          multi_select: tags.map((tag) => ({ name: tag })),
         };
         console.log(`✅ Using tags property: "${tagsPropertyName}"`);
       }
@@ -84,19 +84,19 @@ class NotionService {
                 {
                   type: "text",
                   text: {
-                    content: transcribedText
-                  }
-                }
-              ]
-            }
-          }
-        ]
+                    content: transcribedText,
+                  },
+                },
+              ],
+            },
+          },
+        ],
       });
 
       console.log("✅ Notion page created successfully");
       console.log(`📝 Page ID: ${response.id}`);
       console.log(`🔗 Page URL: ${response.url}`);
-      
+
       return response;
     } catch (error) {
       console.error("❌ Error creating Notion page:", error);
@@ -108,7 +108,7 @@ class NotionService {
   findTitleProperty(properties) {
     // Look for properties with type 'title'
     for (const [name, config] of Object.entries(properties)) {
-      if (config.type === 'title') {
+      if (config.type === "title") {
         return name;
       }
     }
@@ -118,24 +118,33 @@ class NotionService {
   // Helper method to find a suitable tags property
   findTagsProperty(properties) {
     // Look for multiselect properties with tag-like names
-    const tagNames = ['tags', 'tag', 'categories', 'category', 'labels', 'label', 'types', 'type'];
-    
+    const tagNames = [
+      "tags",
+      "tag",
+      "categories",
+      "category",
+      "labels",
+      "label",
+      "types",
+      "type",
+    ];
+
     for (const [name, config] of Object.entries(properties)) {
-      if (config.type === 'multi_select') {
+      if (config.type === "multi_select") {
         // Check if the property name contains any tag-like words
-        if (tagNames.some(tagName => name.toLowerCase().includes(tagName))) {
+        if (tagNames.some((tagName) => name.toLowerCase().includes(tagName))) {
           return name;
         }
       }
     }
-    
+
     // If no tag-like property found, return the first multiselect property
     for (const [name, config] of Object.entries(properties)) {
-      if (config.type === 'multi_select') {
+      if (config.type === "multi_select") {
         return name;
       }
     }
-    
+
     return null;
   }
 
@@ -152,4 +161,4 @@ class NotionService {
   }
 }
 
-export const notionService = new NotionService(); 
+export const notionService = new NotionService();
