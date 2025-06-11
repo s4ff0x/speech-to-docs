@@ -23,5 +23,9 @@ export const config = {
     },
     docId: process.env.DOC_ID,
   },
+  notion: {
+    apiKey: process.env.NOTION_API_KEY,
+    databaseId: process.env.NOTION_DATABASE_ID,
+  },
   timeZone: process.env.TIMEZONE || "",
 };

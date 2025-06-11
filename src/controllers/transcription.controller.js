@@ -1,6 +1,7 @@
 import { File } from "fetch-blob/file.js";
 import { openAIService } from "../services/openai.service.js";
 import { googleDocsService } from "../services/google-docs.service.js";
+import { notionService } from "../services/notion.service.js";
 import { config } from "../config/config.js";
 
 export class TranscriptionController {
@@ -8,7 +9,7 @@ export class TranscriptionController {
     const startTime = Date.now();
     console.log("=== TRANSCRIPTION PROCESS STARTED ===");
     console.log(`Timestamp: ${new Date().toISOString()}`);
-    
+
     try {
       // Authorization check
       console.log("🔐 Checking authorization...");
@@ -29,7 +30,7 @@ export class TranscriptionController {
         console.log("❌ File validation failed - no file or buffer provided");
         return res.status(400).json({ error: "No audio file provided." });
       }
-      
+
       console.log("📊 File details:");
       console.log(`  - Original name: ${req.file.originalname}`);
       console.log(`  - MIME type: ${req.file.mimetype}`);
@@ -46,66 +47,130 @@ export class TranscriptionController {
       let rawTranscriptionText;
       const maxRetries = 5;
       const retryDelay = 3000; // 1 second delay between retries
-      
+
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          console.log(`🎙️ Starting OpenAI transcription (attempt ${attempt}/${maxRetries})...`);
+          console.log(
+            `🎙️ Starting OpenAI transcription (attempt ${attempt}/${maxRetries})...`,
+          );
           const transcriptionStartTime = Date.now();
           rawTranscriptionText = await openAIService.transcribeAudio(fileBlob);
           const transcriptionDuration = Date.now() - transcriptionStartTime;
-          
+
           console.log("✅ OpenAI transcription completed successfully");
           console.log(`⏱️ Transcription took: ${transcriptionDuration}ms`);
-          console.log(`📝 Transcription length: ${rawTranscriptionText.length} characters`);
+          console.log(
+            `📝 Transcription length: ${rawTranscriptionText.length} characters`,
+          );
           console.log("📄 Original Transcription:", rawTranscriptionText);
           break; // Success, exit retry loop
         } catch (error) {
-          console.error(`❌ Error during OpenAI transcription (attempt ${attempt}/${maxRetries}):`, error.message);
-          
+          console.error(
+            `❌ Error during OpenAI transcription (attempt ${attempt}/${maxRetries}):`,
+            error.message,
+          );
+
           if (attempt === maxRetries) {
             console.error("💥 All transcription attempts failed");
             console.error("Stack trace:", error.stack);
-            return res.status(500).json({ 
-              error: "Failed to transcribe audio using OpenAI service after multiple attempts",
+            return res.status(500).json({
+              error:
+                "Failed to transcribe audio using OpenAI service after multiple attempts",
               details: error.message,
-              attempts: maxRetries
+              attempts: maxRetries,
             });
           }
-          
-          console.log(`⏳ Waiting ${retryDelay}ms before retry attempt ${attempt + 1}...`);
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
+
+          console.log(
+            `⏳ Waiting ${retryDelay}ms before retry attempt ${attempt + 1}...`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, retryDelay));
         }
       }
 
       // Google Docs append with retry logic
       const docsMaxRetries = 5;
       const docsRetryDelay = 3000; // 3 second delay between retries
-      
+
       for (let attempt = 1; attempt <= docsMaxRetries; attempt++) {
         try {
-          console.log(`📝 Appending text to Google Docs (attempt ${attempt}/${docsMaxRetries})...`);
+          console.log(
+            `📝 Appending text to Google Docs (attempt ${attempt}/${docsMaxRetries})...`,
+          );
           const docsStartTime = Date.now();
           await googleDocsService.appendText(rawTranscriptionText);
           const docsDuration = Date.now() - docsStartTime;
-          
+
           console.log("✅ Google Docs update completed successfully");
           console.log(`⏱️ Docs update took: ${docsDuration}ms`);
           break; // Success, exit retry loop
         } catch (error) {
-          console.error(`❌ Error during Google Docs update (attempt ${attempt}/${docsMaxRetries}):`, error.message);
-          
+          console.error(
+            `❌ Error during Google Docs update (attempt ${attempt}/${docsMaxRetries}):`,
+            error.message,
+          );
+
           if (attempt === docsMaxRetries) {
             console.error("💥 All Google Docs update attempts failed");
             console.error("Stack trace:", error.stack);
-            return res.status(500).json({ 
-              error: "Failed to append text to Google Docs after multiple attempts",
+            return res.status(500).json({
+              error:
+                "Failed to append text to Google Docs after multiple attempts",
               details: error.message,
-              attempts: docsMaxRetries
+              attempts: docsMaxRetries,
             });
           }
-          
-          console.log(`⏳ Waiting ${docsRetryDelay}ms before retry attempt ${attempt + 1}...`);
-          await new Promise(resolve => setTimeout(resolve, docsRetryDelay));
+
+          console.log(
+            `⏳ Waiting ${docsRetryDelay}ms before retry attempt ${attempt + 1}...`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, docsRetryDelay));
+        }
+      }
+
+      // notion feature flag
+      if (config.notion.databaseId) {
+        // Notion page creation with retry logic
+        const notionMaxRetries = 5;
+        const notionRetryDelay = 3000; // 3 second delay between retries
+
+        for (let attempt = 1; attempt <= notionMaxRetries; attempt++) {
+          try {
+            console.log(
+              `📋 Creating Notion page with transcription (attempt ${attempt}/${notionMaxRetries})...`,
+            );
+            const notionStartTime = Date.now();
+            await notionService.createPageWithTranscription(
+              rawTranscriptionText,
+            );
+            const notionDuration = Date.now() - notionStartTime;
+
+            console.log("✅ Notion page creation completed successfully");
+            console.log(`⏱️ Notion creation took: ${notionDuration}ms`);
+            break; // Success, exit retry loop
+          } catch (error) {
+            console.error(
+              `❌ Error during Notion page creation (attempt ${attempt}/${notionMaxRetries}):`,
+              error.message,
+            );
+
+            if (attempt === notionMaxRetries) {
+              console.error("💥 All Notion page creation attempts failed");
+              console.error("Stack trace:", error.stack);
+              return res.status(500).json({
+                error: "Failed to create Notion page after multiple attempts",
+                details: error.message,
+                attempts: notionMaxRetries,
+              });
+            }
+
+            console.log(
+              `⏳ Waiting ${notionRetryDelay}ms before retry attempt ${attempt + 1}...`,
+            );
+            await new Promise((resolve) =>
+              setTimeout(resolve, notionRetryDelay),
+            );
+          }
         }
       }
 
@@ -119,14 +184,17 @@ export class TranscriptionController {
       });
     } catch (error) {
       const totalDuration = Date.now() - startTime;
-      console.error("💥 Unexpected error during transcription process:", error.message);
+      console.error(
+        "💥 Unexpected error during transcription process:",
+        error.message,
+      );
       console.error("Stack trace:", error.stack);
       console.error(`⏱️ Process failed after: ${totalDuration}ms`);
       console.log("=== TRANSCRIPTION PROCESS FAILED ===");
-      
-      return res.status(500).json({ 
+
+      return res.status(500).json({
         error: "Unexpected error occurred during transcription process",
-        details: error.message 
+        details: error.message,
       });
     }
   }
@@ -138,7 +206,7 @@ export class TranscriptionController {
     console.log(`  - Filename: ${filename}`);
     console.log(`  - File type: ${fileType}`);
     console.log(`  - Buffer length: ${file.buffer.length}`);
-    
+
     const blob = new File([file.buffer], filename, { type: fileType });
     console.log("✅ File blob created successfully");
     return blob;
