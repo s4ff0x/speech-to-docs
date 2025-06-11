@@ -26,11 +26,40 @@ class NotionService {
 
   async createPageWithTranscription(transcribedText) {
     try {
+      console.log("🏷️ Fetching existing tags from Notion database...");
+      const existingTags = await this.getExistingTags();
+      console.log(`✅ Found ${existingTags.length} existing tags in database`);
+
       console.log("🏷️ Generating title and tags for transcribed text...");
-      const { title, tags } =
-        await openAIService.generateTitleAndTags(transcribedText);
+      const { title, tags } = await openAIService.generateTitleAndTags(
+        transcribedText,
+        existingTags
+      );
       console.log(`✅ Generated title: "${title}"`);
-      console.log(`✅ Generated ${tags.length} tags:`, tags);
+      console.log(`✅ Selected ${tags.length} tags:`, tags);
+
+      // Analyze which tags are existing vs new
+      const existingTagsUsed = tags.filter((tag) =>
+        existingTags.some(
+          (existingTag) => existingTag.toLowerCase() === tag.toLowerCase()
+        )
+      );
+      const newTags = tags.filter(
+        (tag) =>
+          !existingTags.some(
+            (existingTag) => existingTag.toLowerCase() === tag.toLowerCase()
+          )
+      );
+
+      if (existingTagsUsed.length > 0) {
+        console.log(
+          `♻️  Reusing ${existingTagsUsed.length} existing tags:`,
+          existingTagsUsed
+        );
+      }
+      if (newTags.length > 0) {
+        console.log(`🆕 Creating ${newTags.length} new tags:`, newTags);
+      }
 
       console.log("📋 Fetching database properties...");
       const dbProperties = await this.getDatabaseProperties();
@@ -118,16 +147,7 @@ class NotionService {
   // Helper method to find a suitable tags property
   findTagsProperty(properties) {
     // Look for multiselect properties with tag-like names
-    const tagNames = [
-      "tags",
-      "tag",
-      "categories",
-      "category",
-      "labels",
-      "label",
-      "types",
-      "type",
-    ];
+    const tagNames = ["tags"];
 
     for (const [name, config] of Object.entries(properties)) {
       if (config.type === "multi_select") {
@@ -157,6 +177,42 @@ class NotionService {
     } catch (error) {
       console.error("❌ Error fetching database properties:", error);
       throw error;
+    }
+  }
+
+  async getExistingTags() {
+    try {
+      console.log("🔍 Fetching existing tags from database...");
+
+      // First, find the tags property
+      const dbProperties = await this.getDatabaseProperties();
+      const tagsPropertyName = this.findTagsProperty(dbProperties);
+
+      if (!tagsPropertyName) {
+        console.log("⚠️ No tags property found in database");
+        return [];
+      }
+
+      // Get the property configuration which contains existing options
+      const tagsProperty = dbProperties[tagsPropertyName];
+
+      if (
+        tagsProperty.type === "multi_select" &&
+        tagsProperty.multi_select.options
+      ) {
+        const existingTags = tagsProperty.multi_select.options.map(
+          (option) => option.name
+        );
+        console.log(
+          `✅ Retrieved ${existingTags.length} existing tags from property "${tagsPropertyName}"`
+        );
+        return existingTags;
+      }
+
+      return [];
+    } catch (error) {
+      console.error("❌ Error fetching existing tags:", error);
+      return []; // Return empty array on error to allow the process to continue
     }
   }
 }

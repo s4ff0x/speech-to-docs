@@ -34,14 +34,26 @@ class OpenAIService {
     return response.choices[0].message.content.trim();
   }
 
-  async generateTitleAndTags(text) {
+  async generateTitleAndTags(text, existingTags = []) {
+    const existingTagsText =
+      existingTags.length > 0
+        ? `\n\nExisting tags in the database: ${existingTags.join(", ")}\n\nIMPORTANT: Prioritize using existing tags when they are relevant to the content. Only suggest new tags if the existing ones don't adequately cover the topics in the text.`
+        : "";
+
     const response = await this.client.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content:
-            "You are a helpful assistant that analyzes text and generates a concise title and relevant tags for categorization. Generate a short, descriptive title (3-8 words) that captures the main topic or purpose of the text, and 3-7 relevant tags based on the content, topics, and themes mentioned. Return the result as a JSON object with 'title' (string) and 'tags' (array of strings) properties. Each tag should be 1-3 words max. Focus on topics, categories, actions, and key concepts.",
+          content: `You are a helpful assistant that analyzes text and generates a concise title and relevant tags for categorization. Generate a short, descriptive title (3-8 words) that captures the main topic or purpose of the text, and 3-7 relevant tags based on the content, topics, and themes mentioned.${existingTagsText}
+            
+            Return the result as a JSON object with 'title' (string) and 'tags' (array of strings) properties. Each tag should be 1-3 words max. Focus on topics, categories, actions, and key concepts.
+            
+            When existing tags are provided, follow these rules:
+            1. Use existing tags that are relevant to the content (exact match preferred, but semantic similarity is acceptable)
+            2. Only create new tags if the existing ones don't adequately represent the content
+            3. Aim to use a mix of existing and new tags when appropriate
+            4. Keep the total number of tags between 3-7`,
         },
         {
           role: "user",
