@@ -90,11 +90,15 @@ class OpenAIService {
 Categories and strict inclusion criteria:
 
 1) dev
-Decide if the text clearly belongs to "Development". Include when the text is about:
 - Programming (code, libraries, frameworks, debugging, algorithms, data structures)
 - Software engineering (apps, web, mobile, backend, frontend, APIs, databases, cloud, DevOps, testing, deployment)
 - Related IT tools/environments (IDEs, version control, Git, CI/CD, Docker, etc.)
-- Learning materials about development (courses, tutorials, notes), even if not hands-on coding
+- Game design and development (mechanics, engines, assets, level design, publishing)
+- Learning materials about development (courses, tutorials, documentation, video lessons, study notes), even if not hands-on coding
+- Any IT, programming, or software-related content, even if indirect (careers in IT, dev culture, workflows, tools)
+- Any kind of product creation (digital or physical): designing, building, prototyping, producing, or explaining how something is created
+- Any kind of education, teaching, or learning: tutorials, guides, lessons, study materials, online/offline courses, coaching, instructions
+- Any kind of design work: UI/UX design, graphic design, visual design, architectural design, product design, creative design processes
 
 2) health
 Decide if the text clearly belongs to "Health". Include when the text is about:
@@ -102,6 +106,73 @@ Decide if the text clearly belongs to "Health". Include when the text is about:
 - Mental health (stress, anxiety, depression, therapy, psychology, emotional well-being)
 - Healthcare system/practice (doctors, hospitals, medications, research, trials, advice, patient care)
 - Learning materials about health (articles, guides, educational videos/resources about medicine, fitness, psychology, healthcare)
+
+3) art
+- Writing (stories, novels, essays, creative writing)
+- Poetry (poems, haiku, lyrics, spoken word)
+- Visual arts (drawing, painting, illustration, sketching, sculpture, photography)
+- Performing arts (theater, dance, acting, performance)
+- Digital art and creative design (graphic design, animation, multimedia)
+- Learning materials about art (tutorials, courses, guides, educational videos or articles about writing, poetry, drawing, painting, or other arts)
+
+4) task
+- Any action that someone needs to do (personal or work)
+- To-do items, chores, responsibilities, assignments
+- Instructions for action (e.g., "Fix the bug in the login page", "Write an essay", "Buy groceries")
+- Work-related tasks (coding, writing reports, attending meetings)
+- Personal tasks (call a friend, clean the room, go to the gym)
+- Educational tasks (study chapter 3, complete a homework, watch a tutorial)
+- Any text that is phrased as an action or obligation, explicitly or implicitly
+
+5) important
+- Critical facts (numbers, dates, metrics, key results, discoveries)
+- Warnings, alerts, health/safety notices
+- Official announcements, decisions, deadlines
+- Essential knowledge for understanding a situation (rules, instructions, conditions, limitations, consequences)
+- Key insights, findings, or takeaways from an analysis, meeting, or report
+- Any text explicitly stating that something is "important" (e.g., "important", "важно", "важный", "crucial", "critical", "essential")
+- Any text where the author directly explains or marks it as important information
+
+6) philosophy
+- Classical philosophy (Plato, Aristotle, Kant, Nietzsche, etc.)
+- Modern philosophy (existentialism, phenomenology, postmodernism, analytic philosophy)
+- Ethical discussions (right/wrong, morality, justice, values, human nature)
+- Metaphysics (existence, reality, time, space, free will, determinism)
+- Epistemology (knowledge, truth, belief, skepticism, perception)
+- Logic and reasoning (arguments, fallacies, structure of thought)
+- Aesthetics (beauty, art theory, meaning of art)
+- Political philosophy (freedom, rights, justice, state, society)
+- Any text reflecting on meaning of life, human purpose, consciousness, or deep abstract reasoning
+- Learning or teaching materials about philosophy (tutorials, lectures, courses, essays, guides)
+
+7) idea
+- Any new thought, suggestion, or proposal (e.g., "What if we build an app for this?")
+- Creative concepts (stories, inventions, designs, art or business concepts)
+- Plans or initiatives (e.g., "We could start a project to…")
+- Hypothetical or speculative reasoning (e.g., "Imagine if humans could live on Mars.")
+- Brainstorming or ideation notes (early drafts, sketches of thoughts)
+- Philosophical or abstract ideas (meaning of life, new perspectives, theories)
+- Any text where the author directly says they have an idea or are sharing one
+
+8) mistake
+- Errors, bugs, failures, crashes, incorrect behavior
+- Human mistakes (typos, miscalculations, wrong decisions, misunderstanding)
+- Software mistakes (coding errors, wrong output, compile/runtime errors, exceptions, failed tests)
+- Logical or factual mistakes (wrong assumptions, contradictions, false statements)
+- Descriptions of something done incorrectly ("I accidentally deleted the file", "The result was wrong")
+- Explicit mentions of error-related words: "mistake", "error", "bug", "failure", "incorrect", "wrong", "typo" (or equivalents in other languages, e.g. "ошибка", "неверно", "сбой")
+- Any text where the author directly explains that there was a mistake or problem
+
+9) life
+- Human life experiences (daily routines, relationships, emotions, personal growth, family, work-life balance)
+- Reflections about life, existence, or meaning of life
+- Biology of life (living organisms, birth, death, evolution, ecology)
+- Health and lifestyle (habits, food, exercise, well-being as part of living)
+- Life events (marriage, travel, career changes, childhood, aging)
+- Any philosophical or literary text about existence, consciousness, or being alive
+- Any text explicitly mentioning "life" or equivalents (e.g., "жизнь", "vida", "vie")
+
+---
 
 Rules:
 - Consider each category independently; multiple categories may apply.

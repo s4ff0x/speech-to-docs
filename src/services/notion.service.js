@@ -26,15 +26,37 @@ class NotionService {
 
   async createPageWithTranscription(transcribedText) {
     try {
-      console.log("🏷️ Fetching existing tags from Notion database...");
-      const existingTags = await this.getExistingTags();
-      console.log(`✅ Found ${existingTags.length} existing tags in database`);
+      console.log("📋 Fetching database properties...");
+      const dbProperties = await this.getDatabaseProperties();
+      console.log(`✅ Database properties found:`, Object.keys(dbProperties));
 
-      console.log("🏷️ Generating title and tags for transcribed text...");
-      const { title, tags } = await openAIService.generateTitleAndTags(
-        transcribedText,
-        existingTags
-      );
+      // Identify property names once
+      const titlePropertyName = this.findTitleProperty(dbProperties);
+      const tagsPropertyName = this.findTagsProperty(dbProperties);
+      const categoryTagsPropertyName = this.findCategoryTagsProperty(dbProperties);
+      const contentPropertyName = this.findContentProperty(dbProperties);
+
+      // Extract existing options once
+      const existingTags = tagsPropertyName && dbProperties[tagsPropertyName]?.type === "multi_select"
+        ? (dbProperties[tagsPropertyName].multi_select.options || []).map((o) => o.name)
+        : [];
+
+      const existingCategoryTags = categoryTagsPropertyName && dbProperties[categoryTagsPropertyName]?.type === "multi_select"
+        ? (dbProperties[categoryTagsPropertyName].multi_select.options || []).map((o) => o.name)
+        : [];
+
+      console.log(`🏷️ Found ${existingTags.length} existing tags; ${existingCategoryTags.length} existing category-tags`);
+
+      // Run LLM tasks in parallel
+      console.log("🤖 Running OpenAI calls in parallel...");
+      const [titleAndTags, matchedCategoryTags] = await Promise.all([
+        openAIService.generateTitleAndTags(transcribedText, existingTags),
+        categoryTagsPropertyName
+          ? openAIService.classifyCategoryTags(transcribedText, existingCategoryTags)
+          : Promise.resolve([]),
+      ]);
+
+      const { title, tags } = titleAndTags;
       console.log(`✅ Generated title: "${title}"`);
       console.log(`✅ Selected ${tags.length} tags:`, tags);
 
@@ -60,24 +82,6 @@ class NotionService {
       if (newTags.length > 0) {
         console.log(`🆕 Creating ${newTags.length} new tags:`, newTags);
       }
-
-      console.log("📋 Fetching database properties...");
-      const dbProperties = await this.getDatabaseProperties();
-      console.log(`✅ Database properties found:`, Object.keys(dbProperties));
-
-      // Find the title property (it's usually the first property or has type 'title')
-      const titlePropertyName = this.findTitleProperty(dbProperties);
-
-      // Find a multiselect property for tags (specifically 'tags', not 'category-tags')
-      const tagsPropertyName = this.findTagsProperty(dbProperties);
-
-      // Find a multiselect property for category tags (e.g., 'category-tags')
-      const categoryTagsPropertyName = this.findCategoryTagsProperty(
-        dbProperties
-      );
-
-      // Find a suitable content property for the transcribed text
-      const contentPropertyName = this.findContentProperty(dbProperties);
 
       console.log("📄 Creating new page in Notion database...");
 
@@ -106,16 +110,8 @@ class NotionService {
         console.log(`✅ Using tags property: "${tagsPropertyName}"`);
       }
 
-      // Handle category-tags classification using only existing options
+      // Handle category-tags classification using only existing options (already computed)
       if (categoryTagsPropertyName) {
-        const existingCategoryTags = await this.getExistingCategoryTags();
-        console.log(
-          `🏷️ Classifying category-tags from ${existingCategoryTags.length} available options...`
-        );
-        const matchedCategoryTags = await openAIService.classifyCategoryTags(
-          transcribedText,
-          existingCategoryTags
-        );
         console.log(
           `✅ Matched ${matchedCategoryTags.length} category tags:`,
           matchedCategoryTags
