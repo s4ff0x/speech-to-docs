@@ -82,6 +82,67 @@ class OpenAIService {
       };
     }
   }
+
+  async classifyCategoryTags(text, availableTags = []) {
+    // Hardcoded, refined single-prompt classifier for category tags
+    const CATEGORY_PROMPT = `You are a precise text classifier for high-level category tags. You must decide which, if any, of the ALLOWED_TAGS apply to the user's text. Output ONLY JSON with a single field 'tags' (array of strings).
+
+Categories and strict inclusion criteria:
+
+1) dev
+Decide if the text clearly belongs to "Development". Include when the text is about:
+- Programming (code, libraries, frameworks, debugging, algorithms, data structures)
+- Software engineering (apps, web, mobile, backend, frontend, APIs, databases, cloud, DevOps, testing, deployment)
+- Related IT tools/environments (IDEs, version control, Git, CI/CD, Docker, etc.)
+- Learning materials about development (courses, tutorials, notes), even if not hands-on coding
+
+2) health
+Decide if the text clearly belongs to "Health". Include when the text is about:
+- Physical health (illnesses, symptoms, treatments, recovery, exercise, nutrition, sleep, fitness, lifestyle habits)
+- Mental health (stress, anxiety, depression, therapy, psychology, emotional well-being)
+- Healthcare system/practice (doctors, hospitals, medications, research, trials, advice, patient care)
+- Learning materials about health (articles, guides, educational videos/resources about medicine, fitness, psychology, healthcare)
+
+Rules:
+- Consider each category independently; multiple categories may apply.
+- ONLY return tags that exist in ALLOWED_TAGS exactly; NEVER invent new tags or variants.
+- Be conservative: add a tag only if the text clearly matches the above criteria.
+- Return JSON only: {"tags": ["dev", "health"]} (order does not matter).
+`;
+
+    // Ensure allowed tags list is stable and lowercased for matching
+    const allowedSet = new Set((availableTags || []).map((t) => String(t).trim()));
+
+    if (allowedSet.size === 0) {
+      return [];
+    }
+
+    const allowedTagsList = Array.from(allowedSet).join(", ");
+
+    const response = await this.client.chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: CATEGORY_PROMPT },
+        {
+          role: "user",
+          content: `ALLOWED_TAGS: [${allowedTagsList}]\n\nTEXT TO CLASSIFY:\n${text}`,
+        },
+      ],
+    });
+
+    try {
+      const result = JSON.parse(response.choices[0].message.content.trim());
+      const proposed = Array.isArray(result.tags) ? result.tags : [];
+      // Strictly filter to allowed set and preserve input case
+      const proposedSet = new Set(proposed.map((t) => String(t).trim()));
+      const matched = Array.from(allowedSet).filter((t) => proposedSet.has(t));
+      return matched;
+    } catch (error) {
+      console.error("Error parsing category tags from OpenAI response:", error);
+      return [];
+    }
+  }
 }
 
 export const openAIService = new OpenAIService();

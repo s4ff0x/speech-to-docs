@@ -68,8 +68,13 @@ class NotionService {
       // Find the title property (it's usually the first property or has type 'title')
       const titlePropertyName = this.findTitleProperty(dbProperties);
 
-      // Find a multiselect property for tags (look for 'tags', 'tag', 'categories', etc.)
+      // Find a multiselect property for tags (specifically 'tags', not 'category-tags')
       const tagsPropertyName = this.findTagsProperty(dbProperties);
+
+      // Find a multiselect property for category tags (e.g., 'category-tags')
+      const categoryTagsPropertyName = this.findCategoryTagsProperty(
+        dbProperties
+      );
 
       // Find a suitable content property for the transcribed text
       const contentPropertyName = this.findContentProperty(dbProperties);
@@ -99,6 +104,34 @@ class NotionService {
           multi_select: tags.map((tag) => ({ name: tag })),
         };
         console.log(`✅ Using tags property: "${tagsPropertyName}"`);
+      }
+
+      // Handle category-tags classification using only existing options
+      if (categoryTagsPropertyName) {
+        const existingCategoryTags = await this.getExistingCategoryTags();
+        console.log(
+          `🏷️ Classifying category-tags from ${existingCategoryTags.length} available options...`
+        );
+        const matchedCategoryTags = await openAIService.classifyCategoryTags(
+          transcribedText,
+          existingCategoryTags
+        );
+        console.log(
+          `✅ Matched ${matchedCategoryTags.length} category tags:`,
+          matchedCategoryTags
+        );
+        if (matchedCategoryTags.length > 0) {
+          properties[categoryTagsPropertyName] = {
+            multi_select: matchedCategoryTags.map((t) => ({ name: t })),
+          };
+          console.log(
+            `✅ Using category-tags property: "${categoryTagsPropertyName}"`
+          );
+        } else {
+          console.log(
+            "ℹ️ No category-tags matched. Skipping category-tags for this page."
+          );
+        }
       }
 
       if (contentPropertyName) {
@@ -153,22 +186,31 @@ class NotionService {
 
   // Helper method to find a suitable tags property
   findTagsProperty(properties) {
-    // Look for multiselect properties with tag-like names
-    const tagNames = ["tags"];
-
+    // Prefer EXACT property name 'tags' (case-insensitive). Do not fallback to similarly named properties
     for (const [name, config] of Object.entries(properties)) {
-      if (config.type === "multi_select") {
-        // Check if the property name contains any tag-like words
-        if (tagNames.some((tagName) => name.toLowerCase().includes(tagName))) {
-          return name;
-        }
+      if (config.type === "multi_select" && name.trim().toLowerCase() === "tags") {
+        return name;
       }
     }
 
-    // If no tag-like property found, return the first multiselect property
+    return null;
+  }
+
+  // Helper method to find the category-tags property
+  findCategoryTagsProperty(properties) {
+    // Prefer exact 'category-tags' (case-insensitive), else any multiselect containing both 'category' and 'tag'
+    for (const [name, config] of Object.entries(properties)) {
+      if (config.type === "multi_select" && name.toLowerCase() === "category-tags") {
+        return name;
+      }
+    }
+
     for (const [name, config] of Object.entries(properties)) {
       if (config.type === "multi_select") {
-        return name;
+        const lower = name.toLowerCase();
+        if (lower.includes("category") && lower.includes("tag")) {
+          return name;
+        }
       }
     }
 
@@ -248,6 +290,42 @@ class NotionService {
     } catch (error) {
       console.error("❌ Error fetching existing tags:", error);
       return []; // Return empty array on error to allow the process to continue
+    }
+  }
+
+  async getExistingCategoryTags() {
+    try {
+      console.log("🔍 Fetching existing category-tags from database...");
+
+      // First, find the category-tags property
+      const dbProperties = await this.getDatabaseProperties();
+      const categoryTagsPropertyName = this.findCategoryTagsProperty(dbProperties);
+
+      if (!categoryTagsPropertyName) {
+        console.log("⚠️ No category-tags property found in database");
+        return [];
+      }
+
+      // Get the property configuration which contains existing options
+      const categoryTagsProperty = dbProperties[categoryTagsPropertyName];
+
+      if (
+        categoryTagsProperty.type === "multi_select" &&
+        categoryTagsProperty.multi_select.options
+      ) {
+        const existingTags = categoryTagsProperty.multi_select.options.map(
+          (option) => option.name
+        );
+        console.log(
+          `✅ Retrieved ${existingTags.length} existing category-tags from property "${categoryTagsPropertyName}"`
+        );
+        return existingTags;
+      }
+
+      return [];
+    } catch (error) {
+      console.error("❌ Error fetching existing category-tags:", error);
+      return [];
     }
   }
 }
