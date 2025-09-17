@@ -74,7 +74,7 @@ class OpenAIService {
     } catch (error) {
       console.error(
         "Error parsing title and tags from OpenAI response:",
-        error
+        error,
       );
       return {
         title: "Untitled",
@@ -146,13 +146,16 @@ Decide if the text clearly belongs to "Health". Include when the text is about:
 - Learning or teaching materials about philosophy (tutorials, lectures, courses, essays, guides)
 
 7) idea
-- Any new thought, suggestion, or proposal (e.g., "What if we build an app for this?")
-- Creative concepts (stories, inventions, designs, art or business concepts)
-- Plans or initiatives (e.g., "We could start a project to…")
-- Hypothetical or speculative reasoning (e.g., "Imagine if humans could live on Mars.")
-- Brainstorming or ideation notes (early drafts, sketches of thoughts)
-- Philosophical or abstract ideas (meaning of life, new perspectives, theories)
-- Any text where the author directly says they have an idea or are sharing one
+- A new suggestion, plan, or initiative for doing something (e.g., "What if we build an app for this?")
+- A creative or innovative concept (story, invention, design, art or business concept that has not existed before)
+- A concrete plan to start a project, initiative, or change (e.g., "We could launch a platform for…")
+- Hypothetical or speculative proposals with novelty (e.g., "Imagine if we could use AI to personalize education.")
+- Brainstorming or early drafts where the author is clearly proposing something new
+- Any text where the author explicitly states they are sharing or proposing a new idea
+Do NOT classify as an innovative idea if the text is only:
+- General reflection or abstract thinking without a proposal
+- Purely philosophical statements without suggestion for change or innovation
+- Generic statements of fact or personal opinions without a new initiative
 
 8) mistake
 - Errors, bugs, failures, crashes, incorrect behavior
@@ -182,7 +185,9 @@ Rules:
 `;
 
     // Ensure allowed tags list is stable and lowercased for matching
-    const allowedSet = new Set((availableTags || []).map((t) => String(t).trim()));
+    const allowedSet = new Set(
+      (availableTags || []).map((t) => String(t).trim()),
+    );
 
     if (allowedSet.size === 0) {
       return [];
@@ -211,6 +216,73 @@ Rules:
       return matched;
     } catch (error) {
       console.error("Error parsing category tags from OpenAI response:", error);
+      return [];
+    }
+  }
+
+  async classifyProjectTags(text, availableTags = []) {
+    // Hardcoded, refined single-prompt classifier for project tags
+    const PROJECT_PROMPT = `You are a precise text classifier for project-specific tags. Decide which, if any, of the ALLOWED_TAGS apply to the user's text. Output ONLY JSON with a single field 'tags' (array of strings).
+
+Projects and strict inclusion criteria:
+
+1) smart-journal
+- Any direct mention of "smart-journal" by name (case-insensitive), with or without hyphen: "smart journal", "SmartJournal"
+- Descriptions of features, design, or functionality of the smart-journal app (voice notes, text notes, AI insights, tagging, visualizations, templates)
+- Instructions, tutorials, or guides about how to use smart-journal
+- References to its development, UI/UX, architecture, or business context
+- Comparisons with other journaling or note-taking apps if explicitly naming smart-journal
+
+2) p1v3
+- Any direct mention of "p1v3" (case-insensitive), including variations like "P1V3 game" or "project p1v3"
+- Descriptions of features, design, or gameplay of the p1v3 game project
+- References to its development (coding, engines, frameworks, architecture, assets, levels, mechanics)
+- Tutorials, guides, or documentation about p1v3
+- Mentions of updates, releases, or comparisons with other games explicitly naming p1v3
+
+3) p1v4
+- Any direct mention of "p1v4" (case-insensitive), including variations like "p1v4 game" or "project p1v4"
+- Descriptions of features, design, or gameplay of the p1v4 game project
+- References to its development (coding, engines, frameworks, architecture, assets, levels, mechanics)
+- Tutorials, guides, or documentation about p1v4
+- Mentions of updates, releases, or comparisons with other games explicitly naming p1v4
+
+Rules:
+- Consider each tag independently; multiple tags may apply.
+- ONLY return tags that exist in ALLOWED_TAGS exactly; NEVER invent new tags or variants.
+- Be conservative: add a tag only if the text clearly matches the above criteria.
+- Return JSON only: {"tags": ["smart-journal", "p1v3"]} (order does not matter).`;
+
+    const allowedSet = new Set(
+      (availableTags || []).map((t) => String(t).trim()),
+    );
+
+    if (allowedSet.size === 0) {
+      return [];
+    }
+
+    const allowedTagsList = Array.from(allowedSet).join(", ");
+
+    const response = await this.client.chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: PROJECT_PROMPT },
+        {
+          role: "user",
+          content: `ALLOWED_TAGS: [${allowedTagsList}]\n\nTEXT TO CLASSIFY:\n${text}`,
+        },
+      ],
+    });
+
+    try {
+      const result = JSON.parse(response.choices[0].message.content.trim());
+      const proposed = Array.isArray(result.tags) ? result.tags : [];
+      const proposedSet = new Set(proposed.map((t) => String(t).trim()));
+      const matched = Array.from(allowedSet).filter((t) => proposedSet.has(t));
+      return matched;
+    } catch (error) {
+      console.error("Error parsing project tags from OpenAI response:", error);
       return [];
     }
   }

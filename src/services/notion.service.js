@@ -34,6 +34,7 @@ class NotionService {
       const titlePropertyName = this.findTitleProperty(dbProperties);
       const tagsPropertyName = this.findTagsProperty(dbProperties);
       const categoryTagsPropertyName = this.findCategoryTagsProperty(dbProperties);
+      const projectTagsPropertyName = this.findProjectTagsProperty(dbProperties);
       const contentPropertyName = this.findContentProperty(dbProperties);
 
       // Extract existing options once
@@ -45,14 +46,21 @@ class NotionService {
         ? (dbProperties[categoryTagsPropertyName].multi_select.options || []).map((o) => o.name)
         : [];
 
-      console.log(`🏷️ Found ${existingTags.length} existing tags; ${existingCategoryTags.length} existing category-tags`);
+      const existingProjectTags = projectTagsPropertyName && dbProperties[projectTagsPropertyName]?.type === "multi_select"
+        ? (dbProperties[projectTagsPropertyName].multi_select.options || []).map((o) => o.name)
+        : [];
+
+      console.log(`🏷️ Found ${existingTags.length} existing tags; ${existingCategoryTags.length} category-tags; ${existingProjectTags.length} project-tags`);
 
       // Run LLM tasks in parallel
       console.log("🤖 Running OpenAI calls in parallel...");
-      const [titleAndTags, matchedCategoryTags] = await Promise.all([
+      const [titleAndTags, matchedCategoryTags, matchedProjectTags] = await Promise.all([
         openAIService.generateTitleAndTags(transcribedText, existingTags),
         categoryTagsPropertyName
           ? openAIService.classifyCategoryTags(transcribedText, existingCategoryTags)
+          : Promise.resolve([]),
+        projectTagsPropertyName
+          ? openAIService.classifyProjectTags(transcribedText, existingProjectTags)
           : Promise.resolve([]),
       ]);
 
@@ -126,6 +134,26 @@ class NotionService {
         } else {
           console.log(
             "ℹ️ No category-tags matched. Skipping category-tags for this page."
+          );
+        }
+      }
+
+      // Handle project-tags classification using only existing options (already computed)
+      if (projectTagsPropertyName) {
+        console.log(
+          `✅ Matched ${matchedProjectTags.length} project tags:`,
+          matchedProjectTags
+        );
+        if (matchedProjectTags.length > 0) {
+          properties[projectTagsPropertyName] = {
+            multi_select: matchedProjectTags.map((t) => ({ name: t })),
+          };
+          console.log(
+            `✅ Using project-tags property: "${projectTagsPropertyName}"`
+          );
+        } else {
+          console.log(
+            "ℹ️ No project-tags matched. Skipping project-tags for this page."
           );
         }
       }
@@ -205,6 +233,27 @@ class NotionService {
       if (config.type === "multi_select") {
         const lower = name.toLowerCase();
         if (lower.includes("category") && lower.includes("tag")) {
+          return name;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  // Helper method to find the project-tags property
+  findProjectTagsProperty(properties) {
+    // Prefer exact 'project-tags' (case-insensitive), else any multiselect containing 'project' and 'tag'
+    for (const [name, config] of Object.entries(properties)) {
+      if (config.type === "multi_select" && name.toLowerCase() === "project-tags") {
+        return name;
+      }
+    }
+
+    for (const [name, config] of Object.entries(properties)) {
+      if (config.type === "multi_select") {
+        const lower = name.toLowerCase();
+        if (lower.includes("project") && lower.includes("tag")) {
           return name;
         }
       }
