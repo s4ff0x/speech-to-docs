@@ -103,6 +103,7 @@ Categories and strict inclusion criteria:
 2) health
 Decide if the text clearly belongs to "Health". Include when the text is about:
 - Physical health (illnesses, symptoms, treatments, recovery, exercise, nutrition, sleep, fitness, lifestyle habits)
+- Everything related to food
 - Mental health (stress, anxiety, depression, therapy, psychology, emotional well-being)
 - Healthcare system/practice (doctors, hospitals, medications, research, trials, advice, patient care)
 - Learning materials about health (articles, guides, educational videos/resources about medicine, fitness, psychology, healthcare)
@@ -169,7 +170,6 @@ Do NOT classify as an innovative idea if the text is only:
 9) life
 - Human life experiences (daily routines, relationships, emotions, personal growth, family, work-life balance)
 - Reflections about life, existence, or meaning of life
-- Everything related to food
 - Biology of life (living organisms, birth, death, evolution, ecology)
 - Health and lifestyle (habits, food, exercise, well-being as part of living)
 - Life events (marriage, travel, career changes, childhood, aging)
