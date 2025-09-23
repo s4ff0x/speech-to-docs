@@ -169,6 +169,7 @@ Do NOT classify as an innovative idea if the text is only:
 9) life
 - Human life experiences (daily routines, relationships, emotions, personal growth, family, work-life balance)
 - Reflections about life, existence, or meaning of life
+- Everything related to food
 - Biology of life (living organisms, birth, death, evolution, ecology)
 - Health and lifestyle (habits, food, exercise, well-being as part of living)
 - Life events (marriage, travel, career changes, childhood, aging)
