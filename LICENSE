@@ -1,21 +1,66 @@
-MIT License
+END USER LICENSE AGREEMENT (EULA)
 
-Copyright (c) 2025 Anton Mendelson
+Anton Mendelson Software
+Licensed Software: Speech to Docs
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This End-User License Agreement (EULA) is a legal agreement between you (the “Licensee”) and Anton Mendelson (the “Licensor”), the author and developer of the software product identified above (“Software Product”), which includes computer software and may include associated media, printed materials, and “online” or electronic documentation.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+By installing, copying, or otherwise using the Software Product, you agree to be bound by the terms of this EULA.
+If you do not agree to these terms, do not install or use the Software Product.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+SOFTWARE PRODUCT LICENSE
+
+a) Speech to Docs is distributed free of charge for personal use only.
+It may be freely shared online, provided no fee is charged for its distribution and no modifications are made.
+You may not use the Software for commercial purposes, resale, or any activity intended for profit.
+You may not include it in any product or package that generates revenue directly or indirectly.
+It may, however, be shared through personal websites, forums, or media platforms as long as the Software remains unchanged.
+
+1. Grant of License
+
+This EULA grants you the following rights:
+
+Installation and Use:
+You may install and use an unlimited number of copies of the Software Product for your personal use.
+
+Reproduction and Distribution:
+You may reproduce and distribute an unlimited number of copies, provided that each copy is a true and complete copy, including all copyright and trademark notices, and this EULA.
+
+Restrictions on Commercial Use:
+The Software Product may not be sold, rented, leased, or included in any product that aims to generate commercial benefit through its inclusion.
+
+2. Description of Rights and Limitations
+
+Reverse Engineering:
+You may not reverse engineer, decompile, or disassemble the Software Product, except where such activity is expressly permitted by applicable law.
+
+Updates and Maintenance:
+The Software is provided as is. Updates may be released at the Licensor’s discretion and are free of charge when available.
+
+Separation of Components:
+The Software Product is licensed as a single product. Its component parts may not be separated for use on more than one computer.
+
+Transfer:
+You may permanently transfer all of your rights under this EULA, provided the recipient agrees to the terms of this EULA.
+
+Termination:
+The Licensor may terminate this license if you fail to comply with its terms. Upon termination, you must destroy all copies of the Software Product and its components.
+
+3. Copyright
+
+All title and copyrights in and to the Software Product (including but not limited to any code, images, and documentation) are owned by Anton Mendelson.
+The Software Product is protected by copyright laws and international treaties.
+You must treat the Software Product as any other copyrighted material.
+
+Licensed users may use the Software’s features to create their own works (for example, transcriptions, documents, or processed outputs) and distribute such works freely, provided that the Software itself is not redistributed for profit.
+
+LIMITED WARRANTY
+
+No Warranties:
+The Software Product is provided “as is,” without warranty of any kind, express or implied, including but not limited to warranties of merchantability or fitness for a particular purpose.
+The entire risk remains with the user.
+
+No Liability for Damages:
+In no event shall Anton Mendelson be liable for any damages (including, but not limited to, loss of profits, business interruption, or loss of data) arising out of the use or inability to use the Software Product.
+
+© 2025 Anton Mendelson. All Rights Reserved.
