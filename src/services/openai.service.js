@@ -248,6 +248,13 @@ Projects and strict inclusion criteria:
 - Tutorials, guides, or documentation about p1v4
 - Mentions of updates, releases, or comparisons with other games explicitly naming p1v4
 
+4) p2
+- Any direct mention of "p2" (case-insensitive), including variations like "P2 project" or "project P2"
+- Descriptions of features, design, or functionality of the P2 project
+- References to its development (coding, architecture, frameworks, tools)
+- Tutorials, guides, or documentation about P2
+- Mentions of updates, releases, or comparisons with other projects explicitly naming P2
+
 Rules:
 - Consider each tag independently; multiple tags may apply.
 - ONLY return tags that exist in ALLOWED_TAGS exactly; NEVER invent new tags or variants.
