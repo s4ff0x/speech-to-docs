@@ -249,7 +249,7 @@ Projects and strict inclusion criteria:
 - Mentions of updates, releases, or comparisons with other games explicitly naming p1v4
 
 4) p2
-- Any direct mention of "p2" (case-insensitive), including variations like "P2 project" or "project P2"
+- Any direct mention of "p2" (case-insensitive), including variations like "P2 project" or "project P2" or "project 2"
 - Descriptions of features, design, or functionality of the P2 project
 - References to its development (coding, architecture, frameworks, tools)
 - Tutorials, guides, or documentation about P2
