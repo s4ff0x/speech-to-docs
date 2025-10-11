@@ -213,8 +213,8 @@ Rules:
       const proposed = Array.isArray(result.tags) ? result.tags : [];
       // Strictly filter to allowed set and preserve input case
       const proposedSet = new Set(proposed.map((t) => String(t).trim()));
-      const matched = Array.from(allowedSet).filter((t) => proposedSet.has(t));
-      return matched;
+
+      return Array.from(allowedSet).filter((t) => proposedSet.has(t));
     } catch (error) {
       console.error("Error parsing category tags from OpenAI response:", error);
       return [];
@@ -249,7 +249,7 @@ Projects and strict inclusion criteria:
 - Mentions of updates, releases, or comparisons with other games explicitly naming p1v4
 
 4) p2
-- Any direct mention of "p2" (case-insensitive), including variations like "P2 project" or "project P2" or "project 2"
+- Any direct mention of "p2" (case-insensitive), including variations like "P2 project" or "project P2" or "project 2" or russian variations like "п2", "проект п2", "проект 2", "проджект 2"
 - Descriptions of features, design, or functionality of the P2 project
 - References to its development (coding, architecture, frameworks, tools)
 - Tutorials, guides, or documentation about P2
@@ -287,8 +287,8 @@ Rules:
       const result = JSON.parse(response.choices[0].message.content.trim());
       const proposed = Array.isArray(result.tags) ? result.tags : [];
       const proposedSet = new Set(proposed.map((t) => String(t).trim()));
-      const matched = Array.from(allowedSet).filter((t) => proposedSet.has(t));
-      return matched;
+
+      return Array.from(allowedSet).filter((t) => proposedSet.has(t));
     } catch (error) {
       console.error("Error parsing project tags from OpenAI response:", error);
       return [];
