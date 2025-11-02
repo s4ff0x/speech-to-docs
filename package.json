@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node src/app.mjs",
-    "dev": "nodemon src/app.mjs"
+    "dev": "nodemon src/app.mjs",
+    "get-oauth-token": "node src/scripts/get-oauth-token.js"
   },
   "keywords": [
     "nodejs",

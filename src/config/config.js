@@ -22,6 +22,14 @@ export const config = {
       client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
     },
     docId: process.env.DOC_ID,
+    driveFolderId: process.env.GOOGLE_DRIVE_FOLDER_ID,
+    delegatedUser: process.env.GOOGLE_DELEGATED_USER, // User email for OAuth delegation
+    oauth2: {
+      clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET,
+      redirectUri: process.env.GOOGLE_OAUTH2_REDIRECT_URI,
+      refreshToken: process.env.GOOGLE_OAUTH2_REFRESH_TOKEN,
+    },
   },
   notion: {
     apiKey: process.env.NOTION_API_KEY,

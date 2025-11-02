@@ -1,6 +1,7 @@
 import { File } from "fetch-blob/file.js";
 import { openAIService } from "../services/openai.service.js";
 import { googleDocsService } from "../services/google-docs.service.js";
+import { googleDriveService } from "../services/google-drive.service.js";
 import { notionService } from "../services/notion.service.js";
 import { config } from "../config/config.js";
 
@@ -171,6 +172,37 @@ export class TranscriptionController {
   }
 
   /**
+   * Upload audio file to Google Drive
+   * @param {Object} file - Multer file object
+   * @returns {Promise<string>} - File ID of uploaded file
+   */
+  async uploadToGoogleDrive(file) {
+    if (!config.google.driveFolderId) {
+      console.log(
+        "📁 Google Drive folder ID not configured, skipping Drive upload"
+      );
+      return;
+    }
+
+    const fileName = file.originalname || `audio_${Date.now()}.m4a`;
+    const mimeType = file.mimetype || "audio/m4a";
+
+    return await this.executeWithRetry(
+      () =>
+        googleDriveService.uploadFile(
+          file.buffer,
+          fileName,
+          mimeType,
+          config.google.driveFolderId
+        ),
+      5, // maxRetries
+      3000, // retryDelay
+      "Google Drive upload",
+      "Failed to upload file to Google Drive"
+    );
+  }
+
+  /**
    * Log process start information
    */
   logProcessStart() {
@@ -227,14 +259,38 @@ export class TranscriptionController {
       const fileBlob = this.createFileBlob(req.file);
       console.log(`✅ File blob created successfully`);
 
-      // Process transcription
+      // Process transcription and upload to Google Drive in parallel
       let rawTranscriptionText;
+      let driveUploadResult;
+      
       try {
-        rawTranscriptionText = await this.processTranscription(fileBlob);
+        const [transcriptionResult, driveResult] = await Promise.allSettled([
+          this.processTranscription(fileBlob),
+          this.uploadToGoogleDrive(req.file),
+        ]);
+
+        // Handle transcription result
+        if (transcriptionResult.status === "rejected") {
+          return res.status(500).json({
+            error: transcriptionResult.reason.message,
+            details: "OpenAI transcription failed",
+          });
+        }
+        rawTranscriptionText = transcriptionResult.value;
+
+        // Handle Drive upload result (non-blocking)
+        if (driveResult.status === "rejected") {
+          console.warn(
+            `⚠️ Google Drive upload failed: ${driveResult.reason.message}`
+          );
+        } else {
+          driveUploadResult = driveResult.value;
+          console.log(`✅ Google Drive upload completed: ${driveUploadResult}`);
+        }
       } catch (error) {
         return res.status(500).json({
           error: error.message,
-          details: "OpenAI transcription failed",
+          details: "Error processing transcription or Drive upload",
         });
       }
 
