@@ -176,6 +176,39 @@ Do NOT classify as an innovative idea if the text is only:
 - Any philosophical or literary text about existence, consciousness, or being alive
 - Any text explicitly mentioning "life" or equivalents (e.g., "жизнь", "vida", "vie")
 
+10) inflammation
+- Any mention of inflammation, inflammatory processes, or inflammatory conditions, or feelings of inflammation
+- Acute inflammation (swelling, redness, heat, pain, loss of function)
+- Chronic inflammation (long-term inflammatory responses, autoimmune conditions)
+- Inflammatory diseases (arthritis, inflammatory bowel disease, dermatitis, bronchitis, etc.)
+- Inflammatory markers (C-reactive protein, cytokines, interleukins, TNF-alpha, etc.)
+- Anti-inflammatory treatments (medications, diet, lifestyle changes, supplements)
+- Inflammatory pathways, mechanisms, or biological processes
+- Research, studies, or medical information about inflammation
+- Symptoms or conditions related to inflammation (swelling, redness, pain, fever)
+- Any text explicitly mentioning "inflammation", "inflammatory", "inflamed", or related terms (e.g., "воспаление", "inflammación", "inflammation")
+
+11) food
+- Food consumption (meals, snacks, eating, drinking, dining)
+- Food diary entries (logging meals, tracking food intake, recording what was eaten)
+- Nutrition and nutritional information (calories, macronutrients, vitamins, minerals, dietary content)
+- Meal planning, meal prep, recipes, cooking instructions
+- Dietary choices, food preferences, food restrictions (vegetarian, vegan, gluten-free, etc.)
+- Food shopping, grocery lists, food purchases
+- Eating habits, eating patterns, meal timing, portion sizes
+- Food-related health information (nutritional benefits, food allergies, food intolerances)
+- Restaurant experiences, food reviews, dining out
+- Food preparation, cooking methods, ingredients
+- Any text explicitly mentioning "food", "meal", "eating", "nutrition", "diet", "recipe", "cooking", or related terms (e.g., "еда", "comida", "nourriture", "food diary", "meal log")
+
+12) fever
+- Any mention of experiencing fever or having a fever
+- High body temperature (elevated temperature, hyperthermia, above normal body temperature)
+- Fever symptoms (feeling hot, chills, sweating, body aches associated with fever)
+- Fever measurements (temperature readings, thermometer readings showing elevated temperature)
+- Fever-related conditions (febrile illness, fever episodes, fever spikes)
+- Any text explicitly mentioning "fever", "high temperature", "elevated temperature", "feverish", "running a temperature", or related terms (e.g., "лихорадка", "fiebre", "fièvre", "температура", "высокая температура")
+
 ---
 
 Rules:
